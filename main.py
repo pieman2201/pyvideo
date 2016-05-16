@@ -271,58 +271,61 @@ while True:
     if pygame.mouse.get_pressed()[0]:
         undoStack.append(image.copy())
         if crop:
-            baseImage = getZoomed(image, zoomLevel)
-            startPos = mousePos
-            while pygame.mouse.get_pressed()[0]:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        raise SystemExit
-                mousePos = pygame.mouse.get_pos()
-                mousePos = (
-                    int(float(mousePos[0] - offset[0]) / zoomLevel),
-                    int(float(mousePos[1] - offset[1]) / zoomLevel)
-                )
-                cropRect = getRectFromPoints(startPos, mousePos)
-                rectColor = (255, 255, 255)
-                if int(step) % 2:
-                    rectColor = (0, 0, 0)
-                pygame.draw.rect(baseImage, rectColor, cropRect, 2)
-                s.blit(baseImage, offset)
-                update()
-                incStep(0.5)
-                clock.tick(24)
-                baseImage = getZoomed(image, zoomLevel)
-
-            realWidth = round(float(cropRect.width) / zoomLevel)
-            realHeight = round(float(cropRect.height) / zoomLevel)
-            newImage = pygame.Surface((realWidth, realHeight))
-
-            realTop = round(float(cropRect.top - offset[1]) / zoomLevel)
-            realLeft = round(float(cropRect.left - offset[0]) / zoomLevel)
-
-            realCropRect = pygame.Rect(realLeft, realTop, realWidth, realHeight)
-            newImage.blit(image, (0,0), area=realCropRect)
-
-            cropPrompt = TextBox("crop? [y/n]: ", (width, 16), 12)
-            done = False
-            while not done:
-                response = cropPrompt.input()
-                if response != None:
-                    done = True
-                filled = cropPrompt.getFilled()
-                s.blit(filled, (0, height - filled.get_height()))
-                update()
-                incStep()
-                clock.tick(24)
-            if response == "y":
-                image = newImage
-                width = image.get_width()
-                height = image.get_height()
-                s = pygame.display.set_mode((width, height))
-                notifics.addNotification("cropped", 750)
-                zoomLevel = 1.0
+            if mousePos == oldPos:
+                undoStack.pop()
             else:
-                notifics.addNotification("canceled", 1500)
+                baseImage = getZoomed(image, zoomLevel)
+                startPos = mousePos
+                while pygame.mouse.get_pressed()[0]:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            raise SystemExit
+                    mousePos = pygame.mouse.get_pos()
+                    mousePos = (
+                        int(float(mousePos[0] - offset[0]) / zoomLevel),
+                        int(float(mousePos[1] - offset[1]) / zoomLevel)
+                    )
+                    cropRect = getRectFromPoints(startPos, mousePos)
+                    rectColor = (255, 255, 255)
+                    if int(step) % 2:
+                        rectColor = (0, 0, 0)
+                    pygame.draw.rect(baseImage, rectColor, cropRect, 2)
+                    s.blit(baseImage, offset)
+                    update()
+                    incStep(0.5)
+                    clock.tick(24)
+                    baseImage = getZoomed(image, zoomLevel)
+
+                realWidth = round(float(cropRect.width + (offset[0] / zoomLevel)) / zoomLevel)
+                realHeight = round(float(cropRect.height + (offset[1] / zoomLevel)) / zoomLevel)
+                newImage = pygame.Surface((realWidth, realHeight))
+
+                realTop = round(float(cropRect.top) / zoomLevel)
+                realLeft = round(float(cropRect.left) / zoomLevel)
+
+                realCropRect = pygame.Rect(realLeft, realTop, realWidth, realHeight)
+                newImage.blit(image, (0,0), area=realCropRect)
+
+                cropPrompt = TextBox("crop? [y/n]: ", (width, 16), 12)
+                done = False
+                while not done:
+                    response = cropPrompt.input()
+                    if response != None:
+                        done = True
+                    filled = cropPrompt.getFilled()
+                    s.blit(filled, (0, height - filled.get_height()))
+                    update()
+                    incStep()
+                    clock.tick(24)
+                if response == "y":
+                    image = newImage
+                    width = image.get_width()
+                    height = image.get_height()
+                    s = pygame.display.set_mode((width, height))
+                    notifics.addNotification("cropped", 750)
+                    zoomLevel = 1.0
+                else:
+                    notifics.addNotification("canceled", 1500)
         else:
             if mousePos == oldPos:
                 undoStack.pop()
