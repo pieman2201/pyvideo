@@ -296,8 +296,8 @@ while True:
                     clock.tick(24)
                     baseImage = getZoomed(image, zoomLevel)
 
-                realWidth = round(float(cropRect.width + (offset[0] / zoomLevel)) / zoomLevel)
-                realHeight = round(float(cropRect.height + (offset[1] / zoomLevel)) / zoomLevel)
+                realWidth = round(float(cropRect.width + (offset[0] * 0)) / zoomLevel)
+                realHeight = round(float(cropRect.height + (offset[1] * 0)) / zoomLevel)
                 newImage = pygame.Surface((realWidth, realHeight))
 
                 realTop = round(float(cropRect.top) / zoomLevel)
