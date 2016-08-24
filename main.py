@@ -20,15 +20,17 @@ except pygame.error:
     height = int(input("Height: "))
     image = pygame.Surface((width, height))
 
-if width > 1120: width = 1120
-if height > 630: height = 630
+if width > 1120:
+    width = 1120
+if height > 630:
+    height = 630
 
 s = pygame.display.set_mode((width, height))
-s.blit(image, (0,0))
+s.blit(image, (0, 0))
 pygame.display.set_caption(argv[1])
 update = pygame.display.update
 
-penColor = pygame.Color(255, 0, 0) 
+penColor = pygame.Color(255, 0, 0)
 zoomLevel = 1.0
 
 offset = [0, 0]
@@ -36,11 +38,13 @@ offset = [0, 0]
 undoStack = []
 redoStack = []
 
+
 def getZoomed(surface, scale):
     width = float(surface.get_width()) * scale
     height = float(surface.get_height()) * scale
     return pygame.transform.scale(surface, (int(width), int(height)))
-oldPos = (0,0)
+
+oldPos = (0, 0)
 arrows = 0
 radius = 1
 movepr = 10
@@ -48,12 +52,14 @@ crop = False
 
 notifics = NotifyBar(12)
 
+
 def parseHex(hexStr):
-    #assume rrggbb
+    # assume rrggbb
     r = int(hexStr[0:2], 16)
     g = int(hexStr[2:4], 16)
     b = int(hexStr[4:6], 16)
     return r, g, b
+
 
 def getRectFromPoints(point1, point2):
     p1x, p1y = point1
@@ -77,6 +83,7 @@ def getRectFromPoints(point1, point2):
     return pygame.Rect(left, top, width, height)
 step = 0
 
+
 def incStep(val=1.0):
     global step
     step += val
@@ -92,16 +99,18 @@ while True:
             s = pygame.display.set_mode(size)
         elif event.type == pygame.KEYDOWN:
             key = event.key
-            if key == pygame.K_EQUALS: #plus sign on equals key
+            if key == pygame.K_EQUALS:  # plus sign on equals key
                 zoomLevel += 0.25
-                notifics.addNotification("zoom: " + str(zoomLevel * 100) + "%", 500)
-                #print(zoomLevel)
+                notifics.addNotification("zoom: " + str(zoomLevel * 100) + "%",
+                                         500)
+                # print(zoomLevel)
             elif key == pygame.K_MINUS:
                 zoomLevel -= 0.25
                 if zoomLevel <= 0:
                     zoomLevel = 0.25
-                notifics.addNotification("zoom: " + str(zoomLevel * 100) + "%", 500)
-                #print(zoomLevel)
+                notifics.addNotification("zoom: " + str(zoomLevel * 100) + "%",
+                                         500)
+                # print(zoomLevel)
             elif key == pygame.K_UP:
                 offset[1] += movepr * zoomLevel
             elif key == pygame.K_DOWN:
@@ -115,7 +124,7 @@ while True:
                 colorInput = TextBox("hex: ", (width, 16), 12)
                 while not done:
                     hexColor = colorInput.input()
-                    if hexColor != None:
+                    if hexColor is not None:
                         R, G, B = parseHex(hexColor)
                         done = True
                     filled = colorInput.getFilled()
@@ -128,7 +137,7 @@ while True:
                 done = False
                 while not done:
                     radSize = radInput.input()
-                    if radSize != None:
+                    if radSize is not None:
                         radius = int(radSize)
                         done = True
                     filled = radInput.getFilled()
@@ -136,14 +145,15 @@ while True:
                     update()
                     clock.tick(24)
             elif key == pygame.K_k:
-                crop = not crop                
-                notifics.addNotification("crop: " + ("on" if crop else "off"), 2000)
+                crop = not crop
+                notifics.addNotification("crop: " + ("on" if crop else "off"),
+                                         2000)
             elif key == pygame.K_t:
                 done = False
                 textInput = TextBox("text: ", (width, 16), 12)
                 while not done:
                     text = textInput.input()
-                    if text != None:
+                    if text is not None:
                         done = True
                     filled = textInput.getFilled()
                     s.blit(filled, (0, height - filled.get_height()))
@@ -153,7 +163,7 @@ while True:
                 done = False
                 while not done:
                     size = sizeInput.input()
-                    if size != None:
+                    if size is not None:
                         size = int(size)
                         done = True
                     filled = sizeInput.getFilled()
@@ -164,7 +174,7 @@ while True:
                 done = False
                 while not done:
                     color = hexInput.input()
-                    if color != None:
+                    if color is not None:
                         color = parseHex(color)
                         done = True
                     filled = hexInput.getFilled()
@@ -187,7 +197,7 @@ while True:
                     boundsRect = pygame.Rect(mousePos[0], mousePos[1], 0, 0)
                     boundsRect.width = renderedText.get_width() * zoomLevel
                     boundsRect.height = renderedText.get_height() * zoomLevel
-                    s.fill((0,0,0))
+                    s.fill((0, 0, 0))
                     s.blit(getZoomed(image, zoomLevel), offset)
                     s.blit(notificsBar, (1, height - notificsBar.get_height()))
                     pygame.draw.rect(s, (255, 255, 255), boundsRect, 2)
@@ -222,11 +232,12 @@ while True:
                 image = pygame.transform.flip(image, False, True)
                 notifics.addNotification("flipped", 500)
             elif key == pygame.K_ESCAPE:
-                saveInput = TextBox("save as \"" + path + "\"? [y/n/c]: ", (width, 16), 12)
+                saveInput = TextBox("save as \"" + path + "\"? [y/n/c]: ",
+                                    (width, 16), 12)
                 done = False
                 while not done:
                     response = saveInput.input()
-                    if response != None:
+                    if response is not None:
                         done = True
                     filled = saveInput.getFilled()
                     s.blit(filled, (0, height - filled.get_height()))
@@ -245,9 +256,9 @@ while True:
                     saveInput.string = path
                     while not done:
                         pathResponse = saveInput.input()
-                        if pathResponse != None:
+                        if pathResponse is not None:
                             done = True
-                        filled =  saveInput.getFilled()
+                        filled = saveInput.getFilled()
                         s.blit(filled, (0, height - filled.get_height()))
                         update()
                         clock.tick(24)
@@ -257,7 +268,8 @@ while True:
                     raise SystemExit
                 raise SystemExit
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP] or keys[pygame.K_DOWN] or keys[pygame.K_RIGHT] or keys[pygame.K_LEFT]:
+    if (keys[pygame.K_UP] or keys[pygame.K_DOWN] or keys[pygame.K_RIGHT]
+            or keys[pygame.K_LEFT]):
         arrows += 1
     else:
         arrows = 0
@@ -304,21 +316,30 @@ while True:
                     clock.tick(24)
                     baseImage = getZoomed(image, zoomLevel)
 
-                realWidth = round(float(cropRect.width + (offset[0] * 0)) / zoomLevel)
-                realHeight = round(float(cropRect.height + (offset[1] * 0)) / zoomLevel)
+                realWidth = round(
+                    float(cropRect.width + (offset[0] * 0)) / zoomLevel
+                )
+                realHeight = round(
+                    float(cropRect.height + (offset[1] * 0)) / zoomLevel
+                )
                 newImage = pygame.Surface((realWidth, realHeight))
 
                 realTop = round(float(cropRect.top) / zoomLevel)
                 realLeft = round(float(cropRect.left) / zoomLevel)
 
-                realCropRect = pygame.Rect(realLeft, realTop, realWidth, realHeight)
-                newImage.blit(image, (0,0), area=realCropRect)
+                realCropRect = pygame.Rect(
+                    realLeft,
+                    realTop,
+                    realWidth,
+                    realHeight
+                )
+                newImage.blit(image, (0, 0), area=realCropRect)
 
                 cropPrompt = TextBox("crop? [y/n]: ", (width, 16), 12)
                 done = False
                 while not done:
                     response = cropPrompt.input()
-                    if response != None:
+                    if response is not None:
                         done = True
                     filled = cropPrompt.getFilled()
                     s.blit(filled, (0, height - filled.get_height()))
@@ -329,12 +350,14 @@ while True:
                     image = newImage
                     width = image.get_width()
                     height = image.get_height()
-                    if width > 1120: width = 1120
-                    if height > 630: height = 630
+                    if width > 1120:
+                        width = 1120
+                    if height > 630:
+                        height = 630
                     s = pygame.display.set_mode((width, height))
                     notifics.addNotification("cropped", 750)
                     zoomLevel = 1.0
-                    offset = [0,0]
+                    offset = [0, 0]
                 else:
                     notifics.addNotification("canceled", 1500)
         else:
@@ -351,14 +374,14 @@ while True:
                         int(float(mousePos[1] - offset[1]) / zoomLevel)
                     )
                     pygame.draw.line(image, penColor, oldPos, mousePos, radius)
-                    s.fill((0,0,0))
+                    s.fill((0, 0, 0))
                     zoomedImage = getZoomed(image, zoomLevel)
                     s.blit(zoomedImage, offset)
                     update()
                     oldPos = mousePos
                     incStep()
                     clock.tick(60)
-    s.fill((0,0,0))
+    s.fill((0, 0, 0))
     zoomedImage = getZoomed(image, zoomLevel)
     s.blit(zoomedImage, offset)
     notificsBar = notifics.getBar()
@@ -366,4 +389,4 @@ while True:
     update()
     oldPos = mousePos
     incStep()
-    clock.tick(24)    
+    clock.tick(24)
