@@ -16,6 +16,10 @@ class TextBox(object):
         base = pygame.Surface((size[0], size[1]))
         textfont = pygame.font.SysFont("Courier", self.fontSize)
         pyText = textfont.render(text, True, (255, 255, 255))
+        while pyText.get_width() > size[0] - 20:
+            text = text[1:]
+            textfont = pygame.font.SysFont("Courier", self.fontSize)
+            pyText = textfont.render(text, True, (255, 255, 255))
         base.blit(pyText, (2, 0))
         self.startInput = 2 + pyText.get_width()
         textRect1 = pygame.Rect(0, 20, size[0], size[1])
@@ -67,7 +71,9 @@ class TextBox(object):
         newString = self.string
         while fillText.get_width() > maxLength:
             newString = newString[1:]
+            print(newString)
             fillText = textfont.render(newString + ("|" if self.interval > 12 else " "), True, (255, 255, 255))
+            print(fillText.get_width(), maxLength)
         newbase = self.getBase()
         newbase.blit(fillText, (self.startInput, 0))
         return newbase

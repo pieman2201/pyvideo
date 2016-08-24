@@ -1,9 +1,11 @@
+#!/usr/bin/python3
+
 import pygame
 from sys import argv
 from textbox import TextBox
 from notify import NotifyBar
 
-pygame.init()
+pygame.font.init()
 path = argv[1]
 clock = pygame.time.Clock()
 
@@ -215,6 +217,10 @@ while True:
                     notifics.addNotification("redone", 1000)
                 else:
                     notifics.addNotification("nothing to redo", 1000)
+            elif key == pygame.K_f:
+                undoStack.append(image.copy())
+                image = pygame.transform.flip(image, False, True)
+                notifics.addNotification("flipped", 500)
             elif key == pygame.K_ESCAPE:
                 saveInput = TextBox("save as \"" + path + "\"? [y/n/c]: ", (width, 16), 12)
                 done = False
@@ -226,8 +232,10 @@ while True:
                     s.blit(filled, (0, height - filled.get_height()))
                     update()
                     clock.tick(24)
+                print("done")
                 if response == "y":
                     pygame.image.save(image, path)
+                    print("saved")
                 elif response == "n":
                     if "\\" in path:
                         while "\\" != path[-1]:
@@ -244,9 +252,9 @@ while True:
                         update()
                         clock.tick(24)
                     pygame.image.save(image, pathResponse)
+                    print("saved")
                 else:
-                    pass
-
+                    raise SystemExit
                 raise SystemExit
     keys = pygame.key.get_pressed()
     if keys[pygame.K_UP] or keys[pygame.K_DOWN] or keys[pygame.K_RIGHT] or keys[pygame.K_LEFT]:
@@ -321,14 +329,17 @@ while True:
                     image = newImage
                     width = image.get_width()
                     height = image.get_height()
+                    if width > 1120: width = 1120
+                    if height > 630: height = 630
                     s = pygame.display.set_mode((width, height))
                     notifics.addNotification("cropped", 750)
                     zoomLevel = 1.0
+                    offset = [0,0]
                 else:
                     notifics.addNotification("canceled", 1500)
         else:
             if mousePos == oldPos:
-                undoStack.pop()
+                image.set_at(mousePos, penColor)
             else:
                 while pygame.mouse.get_pressed()[0]:
                     for event in pygame.event.get():
