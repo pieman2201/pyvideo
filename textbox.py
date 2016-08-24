@@ -1,6 +1,7 @@
 import pygame
 
-#TextBox class for pygame by Ishan Kamat
+# TextBox class for pygame by Ishan Kamat
+
 
 class TextBox(object):
     def __init__(self, prompt, size, fontSize):
@@ -10,6 +11,7 @@ class TextBox(object):
         self.fontSize = fontSize
         self.interval = 0
         self.startInput = 0
+
     def getBase(self):
         size = self.size
         text = self.text
@@ -25,8 +27,9 @@ class TextBox(object):
         textRect1 = pygame.Rect(0, 20, size[0], size[1])
         textRect2 = pygame.Rect(2, 22, size[0] - 4, size[1] - 4)
         pygame.draw.rect(base, (255, 255, 255), textRect1)
-        pygame.draw.rect(base, (0,0,0), textRect2)
+        pygame.draw.rect(base, (0, 0, 0), textRect2)
         return base
+
     def input(self):
         value = ""
         for event in pygame.event.get():
@@ -59,20 +62,30 @@ class TextBox(object):
         else:
             pass
         self.string += value
+
     def getString(self):
         return self.string
+
     def getFilled(self):
         self.interval += 1
         self.interval %= 24
         fontSize = self.fontSize
         textfont = pygame.font.SysFont("Courier", fontSize)
-        fillText = textfont.render(self.string + ("|" if self.interval > 12 else " "), True, (255, 255, 255))
+        fillText = textfont.render(
+            self.string + ("|" if self.interval > 12 else " "),
+            True,
+            (255, 255, 255)
+        )
         maxLength = self.size[0] - self.startInput
         newString = self.string
         while fillText.get_width() > maxLength:
             newString = newString[1:]
             print(newString)
-            fillText = textfont.render(newString + ("|" if self.interval > 12 else " "), True, (255, 255, 255))
+            fillText = textfont.render(
+                newString + ("|" if self.interval > 12 else " "),
+                True,
+                (255, 255, 255)
+            )
             print(fillText.get_width(), maxLength)
         newbase = self.getBase()
         newbase.blit(fillText, (self.startInput, 0))

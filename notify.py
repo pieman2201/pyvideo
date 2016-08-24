@@ -1,4 +1,6 @@
-import pygame, time
+import pygame
+import time
+
 
 class NotifyBar(object):
     def __init__(self, fontSize):
@@ -28,4 +30,4 @@ class NotifyBar(object):
             notipy = textfont.render(notification, True, (255, 255, 255))
             return notipy
         else:
-            return pygame.Surface((0,0))
+            return pygame.Surface((0, 0))
