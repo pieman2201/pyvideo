@@ -87,7 +87,7 @@ def getRectFromPoints(point1, point2):
 
     return pygame.Rect(left, top, width, height)
 step = 0
-
+paused = False
 
 def incStep(val=1.0):
     global step
@@ -116,6 +116,8 @@ while True:
                 notifics.addNotification("zoom: " + str(zoomLevel * 100) + "%",
                                          500)
                 # print(zoomLevel)
+            elif key == pygame.K_SPACE:
+                paused = not paused
             elif key == pygame.K_UP:
                 offset[1] += movepr * zoomLevel
             elif key == pygame.K_DOWN:
@@ -395,12 +397,17 @@ while True:
     oldPos = mousePos
     incStep()
     clock.tick(24)
-    frame_counter += 1
-    try:
-        image = pygame.image.load(str(frame_counter) + ".bmp")
-    except:
-        frame_counter -= 1
-        while frame_counter > 0:
-            os.popen("rm " + str(frame_counter) + ".bmp")
+    if not paused:
+        frame_counter += 1
+        try:
+            pygame.image.save(image, str(frame_counter-1) + ".bmp")
+            image = pygame.image.load(str(frame_counter) + ".bmp")
+        except:
+            p = os.popen("ffmpeg -i $filename%d.bmp -y -r 24 " + path + ".out.mpg")
+            p.read()
             frame_counter -= 1
-        raise SystemExit
+            while frame_counter > 0:
+                p = os.popen("rm " + str(frame_counter) + ".bmp")
+                p.read()
+                frame_counter -= 1
+            raise SystemExit
