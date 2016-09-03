@@ -4,13 +4,18 @@ import pygame
 from sys import argv
 from textbox import TextBox
 from notify import NotifyBar
+import os
 
-pygame.font.init()
+pygame.init()
 path = argv[1]
 clock = pygame.time.Clock()
+frame_counter = 1
 
 try:
-    image = pygame.image.load(path)
+    vpath = path
+    p = os.popen("ffmpeg -i " + path + " -r 24 $filename%d.bmp")
+    p.read()
+    image = pygame.image.load("1.bmp")
     width = image.get_width()
     height = image.get_height()
     print("Image loaded")
@@ -390,3 +395,12 @@ while True:
     oldPos = mousePos
     incStep()
     clock.tick(24)
+    frame_counter += 1
+    try:
+        image = pygame.image.load(str(frame_counter) + ".bmp")
+    except:
+        frame_counter -= 1
+        while frame_counter > 0:
+            os.popen("rm " + str(frame_counter) + ".bmp")
+            frame_counter -= 1
+        raise SystemExit
