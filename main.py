@@ -388,7 +388,7 @@ while True:
         try:
             pygame.image.save(image, str(frame_counter-1) + ".bmp")
             image = pygame.image.load(str(frame_counter) + ".bmp")
-       except:
+        except:
            p = os.popen(               "ffmpeg -i $filename%d.bmp -y -r 24 " + path + ".out.mpg"                )           #   todo  :     fix trailing    spaces    on   this line               
             p.read()
             frame_counter -= 1
