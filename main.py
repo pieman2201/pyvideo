@@ -5,12 +5,12 @@ from sys import argv
 from textbox import TextBox
 from notify import NotifyBar
 import os
+from time import time
 
 pygame.init()
 path = argv[1]
 clock = pygame.time.Clock()
 frame_counter = 1
-
 try:
     vpath = path
     p = os.popen("ffmpeg -i " + path + " -r 24 $filename%d.bmp")
@@ -42,30 +42,22 @@ offset = [0, 0]
 
 undoStack = []
 redoStack = []
-
-
 def getZoomed(surface, scale):
     width = float(surface.get_width()) * scale
     height = float(surface.get_height()) * scale
     return pygame.transform.scale(surface, (int(width), int(height)))
-
 oldPos = (0, 0)
 arrows = 0
 radius = 1
 movepr = 10
 crop = False
-
 notifics = NotifyBar(12)
-
-
 def parseHex(hexStr):
     # assume rrggbb
     r = int(hexStr[0:2], 16)
     g = int(hexStr[2:4], 16)
     b = int(hexStr[4:6], 16)
     return r, g, b
-
-
 def getRectFromPoints(point1, point2):
     p1x, p1y = point1
     p2x, p2y = point2
@@ -88,7 +80,6 @@ def getRectFromPoints(point1, point2):
     return pygame.Rect(left, top, width, height)
 step = 0
 paused = False
-
 def incStep(val=1.0):
     global step
     step += val
@@ -239,8 +230,7 @@ while True:
                 image = pygame.transform.flip(image, False, True)
                 notifics.addNotification("flipped", 500)
             elif key == pygame.K_ESCAPE:
-                saveInput = TextBox("save as \"" + path + "\"? [y/n/c]: ",
-                                    (width, 16), 12)
+                saveInput = TextBox("save as \"" + path + "\"? [y/n/c]: ", (width, 16), 12)
                 done = False
                 while not done:
                     response = saveInput.input()
@@ -323,12 +313,8 @@ while True:
                     clock.tick(24)
                     baseImage = getZoomed(image, zoomLevel)
 
-                realWidth = round(
-                    float(cropRect.width + (offset[0] * 0)) / zoomLevel
-                )
-                realHeight = round(
-                    float(cropRect.height + (offset[1] * 0)) / zoomLevel
-                )
+                realWidth = round(   float(cropRect.width + (offset[0] * 0)) / zoomLevel   )
+                realHeight = round(  float(cropRect.height + (offset[1] * 0)) / zoomLevel  )
                 newImage = pygame.Surface((realWidth, realHeight))
 
                 realTop = round(float(cropRect.top) / zoomLevel)
@@ -402,8 +388,8 @@ while True:
         try:
             pygame.image.save(image, str(frame_counter-1) + ".bmp")
             image = pygame.image.load(str(frame_counter) + ".bmp")
-        except:
-            p = os.popen("ffmpeg -i $filename%d.bmp -y -r 24 " + path + ".out.mpg")
+       except:
+           p = os.popen(               "ffmpeg -i $filename%d.bmp -y -r 24 " + path + ".out.mpg"                )           #   todo  :     fix trailing    spaces    on   this line               
             p.read()
             frame_counter -= 1
             while frame_counter > 0:
